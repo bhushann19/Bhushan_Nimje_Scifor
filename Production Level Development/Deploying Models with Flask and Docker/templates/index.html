@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tip Prediction</title>
+</head>
+<body>
+    <h1>Tip Prediction</h1>
+    <form id="predict-form">
+        <label for="total_bill">Total Bill:</label>
+        <input type="number" id="total_bill" name="total_bill" step="0.01" required><br><br>
+
+        <label for="size">Size:</label>
+        <input type="number" id="size" name="size" required><br><br>
+
+        <button type="submit">Predict</button>
+    </form>
+
+    <h2>Prediction Result:</h2>
+    <p id="result"></p>
+
+    <script>
+        document.getElementById('predict-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Collect data from form
+            const totalBill = document.getElementById('total_bill').value;
+            const size = document.getElementById('size').value;
+
+            // Create JSON object
+            const data = [
+                {
+                    total_bill: parseFloat(totalBill),
+                    size: parseInt(size)
+                }
+            ];
+
+            // Send POST request to Flask API
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Display prediction result
+                document.getElementById('result').innerText = `Predicted Tip: $${data.predictions[0].toFixed(2)}`;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('result').innerText = 'An error occurred.';
+            });
+        });
+    </script>
+</body>
+</html>
